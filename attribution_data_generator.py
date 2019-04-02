@@ -8,20 +8,18 @@ def generateData(n = 1000, classes = 2, features = 2):
 	'''
 	# start errors
 	# end errors
-	data = np.empty((n, features + 1))
-	start = 0
-	stop = 1
-	class_labels = np.array([])
-	for f in np.arange(0, features):
-		samples_per_feature = int(n/features)
-		samples_per_class = int(samples_per_feature/classes)
-		sampled_data = np.array([])
-		for c in np.arange(0, classes):
-			sampled_data = np.append(sampled_data, np.random.uniform(stop - 1, stop, samples_per_class))
-			class_labels = np.append(class_labels, np.repeat(c, samples_per_class))
-			stop = stop + 1
-		sampled_data = np.append(sampled_data, np.random.uniform(start, stop, n - samples_per_feature))
-		start = stop - 1
-		data[:,f] = sampled_data
-	data[:,features] = class_labels
+	data = np.empty((n, features + 2))
+	class_labels = np.random.choice(np.arange(0, classes), n)
+	feature_important = np.random.choice(np.arange(0, features), n)
+	data[:, data.shape[1] - 2] = class_labels
+	data[:, data.shape[1] - 1] = feature_important
+	for s in np.arange(0, n):
+		current_class = class_labels[s]
+		current_feature = feature_important[s]
+		low = 2 * current_feature + current_class
+		high = low + 1
+		max_low = 2 * current_feature
+		max_high = max_low + classes
+		data[s, current_feature] = np.random.uniform(low, high, 1)
+		data[s, np.delete(np.arange(data.shape[1]-2), current_feature)] = np.random.uniform(max_low, max_high, features - 1)
 	return data
